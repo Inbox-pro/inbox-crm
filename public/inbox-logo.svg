@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 160" width="100%" height="100%">
+  <!-- Open Envelope Graphic -->
+  <g id="envelope-mark" transform="translate(10, 15)">
+    <!-- White Letter Paper -->
+    <rect x="24" y="24" width="112" height="76" rx="4" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1.5" />
+    <!-- Letter text lines -->
+    <line x1="38" y1="44" x2="100" y2="44" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="38" y1="56" x2="120" y2="56" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="38" y1="68" x2="88" y2="68" stroke="#93C5FD" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Top Flap (Green) -->
+    <polygon points="20,50 80,4 140,50" fill="#48A43F" />
+
+    <!-- Left Fold (Orange) -->
+    <polygon points="16,48 80,94 16,134" fill="#D95328" />
+
+    <!-- Right Overlapping Fold (Vibrant Blue) -->
+    <polygon points="144,48 144,134 44,134 110,72" fill="#0084C7" />
+    
+    <!-- Base Bottom Accent (Deep Azure) -->
+    <polygon points="16,134 44,134 80,94" fill="#BF360C" opacity="0.15" />
+  </g>
+
+  <!-- Typography: Inbox Infotech Pvt.Ltd. -->
+  <g id="brand-typography" transform="translate(190, 30)">
+    <!-- "Inbox" Title -->
+    <text x="0" y="58" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="64" font-weight="700" fill="currentColor" letter-spacing="-0.5">Inbox</text>
+    
+    <!-- Dividing Rule -->
+    <line x1="0" y1="72" x2="210" y2="72" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round" />
+    
+    <!-- "Infotech Pvt.Ltd." Subtitle -->
+    <text x="0" y="96" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="21" font-weight="600" fill="currentColor" letter-spacing="0.5" opacity="0.9">Infotech Pvt.Ltd.</text>
+  </g>
+</svg>

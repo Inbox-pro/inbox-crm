@@ -1,0 +1,6 @@
+{
+  "name": "Inbox CRM",
+  "description": "Modern enterprise SaaS CRM platform by Inbox Infotech Pvt. Ltd. for managing leads, contacts, companies, deals, tasks, reports, and AI insights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
