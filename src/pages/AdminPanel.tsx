@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 import { settingsService, OrganizationSettings } from '../services/settingsService';
 import { mockDb } from '../mock/db';
 import { Role } from '../types';
@@ -47,6 +48,7 @@ const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
 export const AdminPanel: React.FC = () => {
   const { role, currentUser, switchRole } = useAuth();
   const { showToast } = useToast();
+  const { t } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<'users' | 'tenant' | 'security' | 'database'>('users');
   const [settings, setSettings] = useState<OrganizationSettings | null>(null);
@@ -194,14 +196,14 @@ export const AdminPanel: React.FC = () => {
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-              Admin & Governance Console
+              {t('admin.title', 'Admin & Governance Console')}
             </h1>
             <span className="px-2.5 py-0.5 rounded-md text-xs font-bold bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
               Super Admin Access
             </span>
           </div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Global system health, employee RBAC privileges, tenant policies, and database safeguards.
+            {t('admin.subtitle', 'Global system health, employee RBAC privileges, tenant policies, and database safeguards.')}
           </p>
         </div>
 

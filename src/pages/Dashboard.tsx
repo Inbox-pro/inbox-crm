@@ -23,6 +23,7 @@ import { tasksService } from '../services/tasksService';
 import { activitiesService } from '../services/activitiesService';
 import { leadsService } from '../services/leadsService';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Task, Activity, Lead } from '../types';
 import {
   ResponsiveContainer,
@@ -48,6 +49,7 @@ export const Dashboard: React.FC = () => {
 
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { t, tPeriod, tStage, tActivityType, tStatus } = useLanguage();
 
   const kpiData = mockDb.getDashboardKpis(dateRange);
 
@@ -135,14 +137,14 @@ export const Dashboard: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Executive CRM Dashboard
+              {t('dashboard.title', 'Executive CRM Dashboard')}
             </h1>
             <span className="hidden sm:inline-flex text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800">
-              Live Real-Time
+              {t('dashboard.live_badge', 'Live Real-Time')}
             </span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Real-time pipeline performance, conversion telemetry, and team activity.
+            {t('dashboard.subtitle', 'Real-time pipeline performance, conversion telemetry, and team activity.')}
           </p>
         </div>
 
@@ -161,7 +163,7 @@ export const Dashboard: React.FC = () => {
                     : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                {period}
+                {tPeriod(period)}
               </button>
             ))}
           </div>
@@ -172,7 +174,7 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         <KpiCard
           id="kpi-total-leads"
-          title="Total Leads"
+          title={t('dashboard.total_leads', 'Total Leads')}
           value={kpiData.totalLeads.toLocaleString()}
           change={kpiData.leadGrowthPercent}
           icon={Users}
@@ -182,7 +184,7 @@ export const Dashboard: React.FC = () => {
         />
         <KpiCard
           id="kpi-new-leads"
-          title="New Inbound"
+          title={t('dashboard.new_inbound', 'New Inbound')}
           value={kpiData.newLeads}
           change={18.2}
           icon={Users}
@@ -192,7 +194,7 @@ export const Dashboard: React.FC = () => {
         />
         <KpiCard
           id="kpi-open-deals"
-          title="Open Deals"
+          title={t('dashboard.open_deals', 'Open Deals')}
           value={kpiData.openDeals}
           change={8.5}
           icon={Briefcase}
@@ -202,7 +204,7 @@ export const Dashboard: React.FC = () => {
         />
         <KpiCard
           id="kpi-pipeline-value"
-          title="Pipeline Value"
+          title={t('dashboard.pipeline_value', 'Pipeline Value')}
           value={kpiData.pipelineValueFormatted}
           change={12.4}
           icon={TrendingUp}
@@ -212,7 +214,7 @@ export const Dashboard: React.FC = () => {
         />
         <KpiCard
           id="kpi-won-revenue"
-          title="Won Revenue"
+          title={t('dashboard.won_revenue', 'Won Revenue')}
           value={kpiData.wonRevenueFormatted}
           change={kpiData.revenueGrowthPercent}
           icon={DollarSign}
@@ -222,7 +224,7 @@ export const Dashboard: React.FC = () => {
         />
         <KpiCard
           id="kpi-conversion-rate"
-          title="Win / Conv. Rate"
+          title={t('dashboard.conversion_rate', 'Win Rate')}
           value={`${kpiData.conversionRate}%`}
           change={3.2}
           icon={CheckCircle2}
@@ -239,10 +241,10 @@ export const Dashboard: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                Revenue Bookings vs Quota Target (₹ Lakhs)
+                {t('dashboard.revenue_chart_title', 'Revenue Bookings vs Quota Target (₹ Lakhs)')}
               </h2>
               <p className="text-xs text-slate-400">
-                Monthly revenue closed against organizational quotas
+                {t('dashboard.revenue_chart_subtitle', 'Monthly revenue closed against organizational quotas')}
               </p>
             </div>
             <span className="text-xs font-semibold px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
@@ -281,8 +283,8 @@ export const Dashboard: React.FC = () => {
                     }}
                   />
                   <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Bar dataKey="Actual" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Closed Won (₹L)" />
-                  <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} name="Quota Target (₹L)" />
+                  <Bar dataKey="Actual" fill="#3b82f6" radius={[4, 4, 0, 0]} name={t('dashboard.closed_won_legend', 'Closed Won (₹L)')} />
+                  <Bar dataKey="Target" fill="#94a3b8" radius={[4, 4, 0, 0]} name={t('dashboard.quota_target_legend', 'Quota Target (₹L)')} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -294,14 +296,14 @@ export const Dashboard: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-2">
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                Pipeline Stages Breakdown
+                {t('dashboard.pipeline_overview', 'Pipeline Stages Breakdown')}
               </h2>
               <span className="text-xs text-blue-600 font-semibold cursor-pointer" onClick={() => navigate('/deals')}>
-                View Kanban →
+                {t('dashboard.view_pipeline', 'View Pipeline Board')} →
               </span>
             </div>
             <p className="text-xs text-slate-400 mb-4">
-              Deal volume and value across each milestone
+              {t('dashboard.pipeline_breakdown_desc', 'Deal volume and value across each milestone')}
             </p>
 
             <div className="space-y-3">
@@ -309,7 +311,7 @@ export const Dashboard: React.FC = () => {
                 <div key={st.stage} className="space-y-1">
                   <div className="flex items-center justify-between text-xs">
                     <span className="font-semibold text-slate-700 dark:text-slate-200">
-                      {st.stage} ({st.count})
+                      {tStage(st.stage)} ({st.count})
                     </span>
                     <span className="text-slate-500 font-mono">
                       ₹{(st.value / 100000).toFixed(1)}L
@@ -330,7 +332,7 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <span className="text-slate-500">Active Weighted Win Forecast</span>
+            <span className="text-slate-500">{t('dashboard.active_forecast', 'Active Weighted Win Forecast')}</span>
             <span className="font-bold text-emerald-600 dark:text-emerald-400">
               ₹27.6 Lakhs (64.5%)
             </span>
@@ -346,14 +348,14 @@ export const Dashboard: React.FC = () => {
             <div className="flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-blue-600" />
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                High-Intent AI Leads
+                {t('dashboard.high_intent_leads', 'High-Intent AI Leads')}
               </h2>
             </div>
             <button
               onClick={() => navigate('/leads')}
               className="text-xs font-semibold text-blue-600 hover:text-blue-700"
             >
-              All Leads ({kpiData.totalLeads})
+              {t('dashboard.view_leads', 'All Leads')} ({kpiData.totalLeads})
             </button>
           </div>
 
@@ -387,10 +389,10 @@ export const Dashboard: React.FC = () => {
                       onClick={() => handleConvertLead(lead.id, lead.name)}
                       className="text-blue-600 font-medium hover:underline inline-flex items-center gap-0.5"
                     >
-                      Convert <ArrowRight className="w-3 h-3" />
+                      {t('leads.convert', 'Convert')} <ArrowRight className="w-3 h-3" />
                     </button>
                   ) : (
-                    <span className="text-emerald-600 font-medium">Converted</span>
+                    <span className="text-emerald-600 font-medium">{tStatus('Converted')}</span>
                   )}
                 </div>
               </div>
@@ -402,13 +404,13 @@ export const Dashboard: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-              Upcoming Action Tasks
+              {t('dashboard.upcoming_tasks', 'Upcoming Action Tasks')}
             </h2>
             <button
               onClick={() => navigate('/tasks')}
               className="text-xs font-semibold text-blue-600 hover:text-blue-700"
             >
-              View Board ({totalOpenTasks})
+              {t('dashboard.view_tasks', 'View Board')} ({totalOpenTasks})
             </button>
           </div>
 
@@ -426,7 +428,7 @@ export const Dashboard: React.FC = () => {
                     {task.title}
                   </p>
                   <p className="text-[11px] text-slate-400 truncate">
-                    {task.relatedCompanyName} • Due {task.dueDate}
+                    {task.relatedCompanyName} • {t('common.due', 'Due')} {task.dueDate}
                   </p>
                 </div>
                 <PriorityBadge priority={task.priority} />
@@ -439,13 +441,13 @@ export const Dashboard: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-              Recent Touchpoints
+              {t('dashboard.recent_activities', 'Recent Activities')}
             </h2>
             <button
               onClick={() => navigate('/activities')}
               className="text-xs font-semibold text-blue-600 hover:text-blue-700"
             >
-              Audit Log
+              {t('dashboard.view_activities', 'View Timeline')}
             </button>
           </div>
 
@@ -459,7 +461,7 @@ export const Dashboard: React.FC = () => {
                       {act.performedByName}
                     </span>
                     <span className="text-[10px] text-slate-400 shrink-0">
-                      {act.type}
+                      {tActivityType(act.type)}
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-500 truncate">
@@ -477,10 +479,10 @@ export const Dashboard: React.FC = () => {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-              Sales Representative Performance Leaderboard
+              {t('dashboard.leaderboard_title', 'Sales Representative Performance Leaderboard')}
             </h2>
             <p className="text-xs text-slate-400">
-              Closed revenue, quota attainment, and individual win ratios
+              {t('dashboard.leaderboard_subtitle', 'Closed revenue, quota attainment, and individual win ratios')}
             </p>
           </div>
           <button
@@ -488,7 +490,7 @@ export const Dashboard: React.FC = () => {
             onClick={() => navigate('/reports')}
             className="text-xs font-semibold text-blue-600 hover:text-blue-700"
           >
-            Full Analytics →
+            {t('dashboard.full_analytics', 'Full Analytics')} →
           </button>
         </div>
 
@@ -496,11 +498,11 @@ export const Dashboard: React.FC = () => {
           <table className="w-full text-left text-xs">
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 uppercase tracking-wider font-semibold">
-                <th className="pb-3 font-semibold">Representative</th>
-                <th className="pb-3 font-semibold">Deals Closed</th>
-                <th className="pb-3 font-semibold">Booked Revenue</th>
-                <th className="pb-3 font-semibold">Win Rate</th>
-                <th className="pb-3 font-semibold">Quota Attainment</th>
+                <th className="pb-3 font-semibold">{t('reports.representative', 'Representative')}</th>
+                <th className="pb-3 font-semibold">{t('reports.deals_closed', 'Deals Closed')}</th>
+                <th className="pb-3 font-semibold">{t('reports.booked_revenue', 'Booked Revenue')}</th>
+                <th className="pb-3 font-semibold">{t('reports.win_rate', 'Win Rate')}</th>
+                <th className="pb-3 font-semibold">{t('reports.quota_attainment', 'Quota Attainment')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -514,7 +516,7 @@ export const Dashboard: React.FC = () => {
                     <span className="font-semibold text-slate-900 dark:text-white">{rep.name}</span>
                   </td>
                   <td className="py-3 text-slate-600 dark:text-slate-300 font-medium">
-                    {rep.dealsWon} accounts
+                    {rep.dealsWon} {t('reports.accounts', 'accounts')}
                   </td>
                   <td className="py-3 font-bold text-slate-900 dark:text-white font-mono">
                     ₹{rep.revenueLakhs}L

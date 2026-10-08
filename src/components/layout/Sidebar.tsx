@@ -17,6 +17,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { InboxLogo } from '../common/InboxLogo';
 
 interface SidebarProps {
@@ -26,21 +27,22 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
   const { currentOrg, role } = useAuth();
+  const { t, tRole } = useLanguage();
 
   const isAdmin = role === 'Super Admin' || role === 'Admin';
 
   const navItems = [
-    { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/leads', label: 'Leads', icon: Users, badge: '105' },
-    { to: '/contacts', label: 'Contacts', icon: Contact },
-    { to: '/companies', label: 'Companies', icon: Building2 },
-    { to: '/deals', label: 'Deals & Pipeline', icon: Kanban, badge: '30' },
-    { to: '/tasks', label: 'Tasks', icon: CheckSquare, badge: '52' },
-    { to: '/activities', label: 'Activities', icon: History },
-    { to: '/reports', label: 'Reports & Analytics', icon: BarChart3 },
-    { to: '/ai-assistant', label: 'Inbox AI Assistant', icon: Bot, isAi: true },
-    { to: '/admin', label: 'Admin Panel', icon: ShieldAlert, isAdminOnly: true },
-    { to: '/settings', label: 'Settings', icon: Settings },
+    { to: '/dashboard', label: t('nav.dashboard', 'Dashboard'), icon: LayoutDashboard },
+    { to: '/leads', label: t('nav.leads', 'Leads'), icon: Users, badge: '105' },
+    { to: '/contacts', label: t('nav.contacts', 'Contacts'), icon: Contact },
+    { to: '/companies', label: t('nav.companies', 'Companies'), icon: Building2 },
+    { to: '/deals', label: t('nav.deals', 'Deals & Pipeline'), icon: Kanban, badge: '30' },
+    { to: '/tasks', label: t('nav.tasks', 'Tasks'), icon: CheckSquare, badge: '52' },
+    { to: '/activities', label: t('nav.activities', 'Activities'), icon: History },
+    { to: '/reports', label: t('nav.reports', 'Reports & Analytics'), icon: BarChart3 },
+    { to: '/ai-assistant', label: t('nav.ai', 'Inbox AI Assistant'), icon: Bot, isAi: true },
+    { to: '/admin', label: t('nav.admin', 'Admin Panel'), icon: ShieldAlert, isAdminOnly: true },
+    { to: '/settings', label: t('nav.settings', 'Settings'), icon: Settings },
   ];
 
   return (
@@ -137,14 +139,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => 
           <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-800">
             <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300">
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>RBAC Role: {role}</span>
+              <span>{t('nav.rbac_role', 'RBAC Role')}: {tRole(role)}</span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">
-              Inbox Infotech • {currentOrg?.plan || 'Enterprise'} Tier
+              Inbox Infotech • {currentOrg?.plan || 'Enterprise'} {t('nav.tier_enterprise', 'Tier')}
             </p>
           </div>
         ) : (
-          <div className="w-8 h-8 mx-auto rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500" title={`Role: ${role}`}>
+          <div className="w-8 h-8 mx-auto rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500" title={`${t('nav.rbac_role', 'RBAC Role')}: ${tRole(role)}`}>
             <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
         )}

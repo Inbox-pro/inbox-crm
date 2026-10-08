@@ -1,5 +1,6 @@
 import React from 'react';
 import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface KpiCardProps {
   id?: string;
@@ -19,13 +20,15 @@ export const KpiCard: React.FC<KpiCardProps> = ({
   title,
   value,
   change,
-  changePeriod = 'vs last month',
+  changePeriod,
   icon: Icon,
   iconColor = 'text-blue-600 dark:text-blue-400',
   iconBg = 'bg-blue-50 dark:bg-blue-950/50',
   subtitle,
   onClick,
 }) => {
+  const { t } = useLanguage();
+  const effectivePeriod = changePeriod ?? t('dashboard.vs_last_month', 'vs last month');
   const isPositive = change !== undefined ? change >= 0 : true;
 
   return (
@@ -66,7 +69,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
             </span>
           )}
           <span className="text-slate-500 dark:text-slate-400 truncate">
-            {subtitle || changePeriod}
+            {subtitle || effectivePeriod}
           </span>
         </div>
       )}

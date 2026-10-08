@@ -22,8 +22,10 @@ import { EmptyState } from '../components/common/EmptyState';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Contacts: React.FC = () => {
+  const { t } = useLanguage();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [totalContacts, setTotalContacts] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -132,14 +134,14 @@ export const Contacts: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Customer Contacts
+              {t('contacts.title', 'Customer Contacts')}
             </h1>
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              {totalContacts} records
+              {totalContacts} {t('common.details', 'records')}
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Stakeholder contacts, account decision makers, and communication channels.
+            {t('contacts.subtitle', 'Stakeholder contacts, account decision makers, and communication channels.')}
           </p>
         </div>
 
@@ -150,7 +152,7 @@ export const Contacts: React.FC = () => {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg shadow-xs transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Export CSV</span>
+            <span className="hidden sm:inline">{t('common.export', 'Export CSV')}</span>
           </button>
           {hasPermission('contacts.create') && (
             <button
@@ -159,7 +161,7 @@ export const Contacts: React.FC = () => {
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Contact</span>
+              <span>{t('contacts.new_contact', 'Add Contact')}</span>
             </button>
           )}
         </div>
@@ -168,7 +170,7 @@ export const Contacts: React.FC = () => {
       {/* Filter Bar */}
       <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex-1 min-w-[240px] max-w-sm">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search contacts by name, role, email..." />
+          <SearchBar value={search} onChange={setSearch} placeholder={t('contacts.search', 'Search contacts by name, role, email...')} />
         </div>
 
         <div className="flex items-center gap-2">
@@ -177,14 +179,15 @@ export const Contacts: React.FC = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-medium"
           >
-            <option value="All">All Statuses</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+            <option value="All">{t('contacts.all_statuses', 'All Statuses')}</option>
+            <option value="Active">{t('status.Active', 'Active')}</option>
+            <option value="Inactive">{t('status.Inactive', 'Inactive')}</option>
           </select>
           <button
             type="button"
             onClick={fetchContacts}
             className="p-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            title={t('common.refresh', 'Refresh list')}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -197,9 +200,9 @@ export const Contacts: React.FC = () => {
           <LoadingSkeleton count={pageSize} />
         ) : contacts.length === 0 ? (
           <EmptyState
-            title="No contacts found"
-            description="Try changing your search keywords or clear current filters."
-            actionLabel="Clear Search"
+            title={t('contacts.no_contacts', 'No contacts found')}
+            description={t('contacts.no_contacts_desc', 'Try changing your search keywords or clear current filters.')}
+            actionLabel={t('contacts.clear_search', 'Clear Search')}
             onAction={() => setSearch('')}
           />
         ) : (
@@ -207,13 +210,13 @@ export const Contacts: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead>
                 <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">
-                  <th className="py-3 px-4">Contact</th>
-                  <th className="py-3 px-4">Organization</th>
-                  <th className="py-3 px-4">Contact Details</th>
-                  <th className="py-3 px-4">Location</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">Owner</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4">{t('contacts.contact_col', 'Contact')}</th>
+                  <th className="py-3 px-4">{t('contacts.org_col', 'Organization')}</th>
+                  <th className="py-3 px-4">{t('contacts.details_col', 'Contact Details')}</th>
+                  <th className="py-3 px-4">{t('contacts.location_col', 'Location')}</th>
+                  <th className="py-3 px-4">{t('common.status', 'Status')}</th>
+                  <th className="py-3 px-4">{t('contacts.owner_col', 'Owner')}</th>
+                  <th className="py-3 px-4 text-right">{t('common.actions', 'Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">

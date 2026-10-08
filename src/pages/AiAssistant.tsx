@@ -24,11 +24,13 @@ import { AiChatMessage } from '../types';
 import { Avatar } from '../components/common/Avatar';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { InboxLogo } from '../components/common/InboxLogo';
 
 export const AiAssistant: React.FC = () => {
   const { currentUser, currentOrg } = useAuth();
   const { showToast } = useToast();
+  const { t } = useLanguage();
 
   const [messages, setMessages] = useState<AiChatMessage[]>([
     {
@@ -142,15 +144,15 @@ export const AiAssistant: React.FC = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                <span>Inbox AI Assistant</span>
+                <span>{t('ai.title', 'Inbox AI Assistant')}</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/80 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                  Gemini Ready
+                  {t('ai.gemini_badge', 'Gemini Ready')}
                 </span>
               </h1>
             </div>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            AI-powered intelligence copilot by Inbox Infotech for sales forecasting, lead qualification, and customer follow-ups.
+            {t('ai.subtitle', 'AI-powered intelligence copilot by Inbox Infotech for sales forecasting, lead qualification, and customer follow-ups.')}
           </p>
         </div>
 
@@ -162,7 +164,7 @@ export const AiAssistant: React.FC = () => {
             type="button"
             onClick={handleClearChat}
             className="p-1.5 text-xs text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
-            title="Clear Chat History"
+            title={t('ai.clear_chat', 'Clear Chat History')}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -356,7 +358,7 @@ export const AiAssistant: React.FC = () => {
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleSendMessage();
           }}
-          placeholder="Ask Inbox AI to forecast revenue, summarize leads, audit deal risks, or draft emails..."
+          placeholder={t('ai.input_placeholder', 'Ask Inbox AI to forecast revenue, summarize leads, audit deal risks, or draft emails...')}
           className="flex-1 px-3 py-2 text-xs bg-transparent border-none text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden"
         />
         <button
@@ -365,7 +367,7 @@ export const AiAssistant: React.FC = () => {
           disabled={!inputPrompt.trim() || isTyping}
           className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
         >
-          <span>Send</span>
+          <span>{t('ai.send', 'Send')}</span>
           <Send className="w-3.5 h-3.5" />
         </button>
       </div>

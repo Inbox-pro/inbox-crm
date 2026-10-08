@@ -1,12 +1,15 @@
 import React from 'react';
 import { TaskPriority } from '../../types';
 import { AlertTriangle, AlertCircle, ArrowUp, ArrowDown } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface PriorityBadgeProps {
   priority: TaskPriority;
 }
 
 export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ priority }) => {
+  const { tPriority } = useLanguage();
+
   const getBadgeConfig = () => {
     switch (priority) {
       case 'Urgent':
@@ -40,7 +43,7 @@ export const PriorityBadge: React.FC<PriorityBadgeProps> = ({ priority }) => {
       className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md border whitespace-nowrap ${classes}`}
     >
       <Icon className="w-3 h-3" />
-      {priority}
+      {tPriority(priority)}
     </span>
   );
 };

@@ -8,8 +8,10 @@ import { dealsService } from '../../services/dealsService';
 import { tasksService } from '../../services/tasksService';
 import { activitiesService } from '../../services/activitiesService';
 import { useToast } from '../../context/ToastContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export const AppLayout: React.FC = () => {
+  const { t, tSource, tStage, tPriority, tActivityType } = useLanguage();
   const [collapsed, setCollapsed] = useState(false);
   const [quickActionType, setQuickActionType] = useState<'lead' | 'deal' | 'task' | 'activity' | null>(null);
 
@@ -137,12 +139,12 @@ export const AppLayout: React.FC = () => {
       <Modal
         isOpen={quickActionType === 'lead'}
         onClose={() => setQuickActionType(null)}
-        title="Create New Lead"
-        subtitle="Add an inbound prospect to your CRM database with AI scoring."
+        title={t('modal.create_lead_title', 'Create New Lead')}
+        subtitle={t('modal.create_lead_subtitle', 'Add an inbound prospect to your CRM database with AI scoring.')}
       >
         <form onSubmit={handleCreateLead} className="space-y-4 text-xs">
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Full Name *</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.full_name', 'Full Name')} *</label>
             <input
               type="text"
               required
@@ -153,7 +155,7 @@ export const AppLayout: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Company / Organization *</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.company', 'Company / Organization')} *</label>
             <input
               type="text"
               required
@@ -165,7 +167,7 @@ export const AppLayout: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Email *</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.email', 'Email')} *</label>
               <input
                 type="email"
                 required
@@ -176,7 +178,7 @@ export const AppLayout: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Phone</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.phone', 'Phone')}</label>
               <input
                 type="text"
                 placeholder="+91 98765 43210"
@@ -188,7 +190,7 @@ export const AppLayout: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Estimated Value (₹)</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.est_value', 'Estimated Value')}</label>
               <input
                 type="number"
                 value={leadForm.value}
@@ -197,17 +199,17 @@ export const AppLayout: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Acquisition Source</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.acq_source', 'Acquisition Source')}</label>
               <select
                 value={leadForm.source}
                 onChange={e => setLeadForm({ ...leadForm, source: e.target.value as any })}
                 className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
               >
-                <option value="Website">Website</option>
-                <option value="Referral">Referral</option>
-                <option value="LinkedIn">LinkedIn</option>
-                <option value="Advertisement">Advertisement</option>
-                <option value="Cold Call">Cold Call</option>
+                <option value="Website">{tSource('Website')}</option>
+                <option value="Referral">{tSource('Referral')}</option>
+                <option value="LinkedIn">{tSource('LinkedIn')}</option>
+                <option value="Advertisement">{tSource('Advertisement')}</option>
+                <option value="Cold Call">{tSource('Cold Call')}</option>
               </select>
             </div>
           </div>
@@ -217,13 +219,13 @@ export const AppLayout: React.FC = () => {
               onClick={() => setQuickActionType(null)}
               className="px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs"
             >
-              Save Lead
+              {t('modal.save_lead', 'Save Lead')}
             </button>
           </div>
         </form>
@@ -233,12 +235,12 @@ export const AppLayout: React.FC = () => {
       <Modal
         isOpen={quickActionType === 'deal'}
         onClose={() => setQuickActionType(null)}
-        title="Create New Sales Opportunity"
-        subtitle="Add a deal directly to the sales pipeline Kanban board."
+        title={t('modal.create_deal_title', 'Create New Sales Opportunity')}
+        subtitle={t('modal.create_deal_subtitle', 'Add a deal directly to the sales pipeline Kanban board.')}
       >
         <form onSubmit={handleCreateDeal} className="space-y-4 text-xs">
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Deal Title *</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.deal_title', 'Deal Title')} *</label>
             <input
               type="text"
               required
@@ -249,7 +251,7 @@ export const AppLayout: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Account / Company *</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.account_company', 'Account / Company')} *</label>
             <input
               type="text"
               required
@@ -261,7 +263,7 @@ export const AppLayout: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Deal Value (₹)</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.deal_value', 'Deal Value')}</label>
               <input
                 type="number"
                 value={dealForm.value}
@@ -270,21 +272,21 @@ export const AppLayout: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Initial Stage</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.initial_stage', 'Initial Stage')}</label>
               <select
                 value={dealForm.stage}
                 onChange={e => setDealForm({ ...dealForm, stage: e.target.value as any })}
                 className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
               >
-                <option value="New">New Discovery</option>
-                <option value="Qualified">Qualified</option>
-                <option value="Proposal">Proposal</option>
-                <option value="Negotiation">Negotiation</option>
+                <option value="New">{tStage('New')}</option>
+                <option value="Qualified">{tStage('Qualified')}</option>
+                <option value="Proposal">{tStage('Proposal')}</option>
+                <option value="Negotiation">{tStage('Negotiation')}</option>
               </select>
             </div>
           </div>
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Target Close Date</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.target_close_date', 'Target Close Date')}</label>
             <input
               type="date"
               value={dealForm.closeDate}
@@ -298,13 +300,13 @@ export const AppLayout: React.FC = () => {
               onClick={() => setQuickActionType(null)}
               className="px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs"
             >
-              Create Deal
+              {t('modal.create_deal', 'Create Deal')}
             </button>
           </div>
         </form>
@@ -314,12 +316,12 @@ export const AppLayout: React.FC = () => {
       <Modal
         isOpen={quickActionType === 'task'}
         onClose={() => setQuickActionType(null)}
-        title="Schedule New Task"
-        subtitle="Assign an action item to keep deal momentum high."
+        title={t('modal.schedule_task_title', 'Schedule New Task')}
+        subtitle={t('modal.schedule_task_subtitle', 'Assign an action item to keep deal momentum high.')}
       >
         <form onSubmit={handleCreateTask} className="space-y-4 text-xs">
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Task Title *</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.task_title', 'Task Title')} *</label>
             <input
               type="text"
               required
@@ -330,7 +332,7 @@ export const AppLayout: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Related Account / Company</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.related_account', 'Related Account / Company')}</label>
             <input
               type="text"
               placeholder="e.g. OmniRetail Labs"
@@ -341,7 +343,7 @@ export const AppLayout: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Due Date</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.due_date', 'Due Date')}</label>
               <input
                 type="date"
                 value={taskForm.dueDate}
@@ -350,16 +352,16 @@ export const AppLayout: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Priority</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('common.priority', 'Priority')}</label>
               <select
                 value={taskForm.priority}
                 onChange={e => setTaskForm({ ...taskForm, priority: e.target.value as any })}
                 className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
               >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Urgent">Urgent</option>
+                <option value="Low">{tPriority('Low')}</option>
+                <option value="Medium">{tPriority('Medium')}</option>
+                <option value="High">{tPriority('High')}</option>
+                <option value="Urgent">{tPriority('Urgent')}</option>
               </select>
             </div>
           </div>
@@ -369,13 +371,13 @@ export const AppLayout: React.FC = () => {
               onClick={() => setQuickActionType(null)}
               className="px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs"
             >
-              Save Task
+              {t('modal.save_task', 'Save Task')}
             </button>
           </div>
         </form>
@@ -385,28 +387,28 @@ export const AppLayout: React.FC = () => {
       <Modal
         isOpen={quickActionType === 'activity'}
         onClose={() => setQuickActionType(null)}
-        title="Log Customer Activity"
-        subtitle="Record touchpoints across email, phone, or meetings."
+        title={t('modal.log_activity_title', 'Log Customer Activity')}
+        subtitle={t('modal.log_activity_subtitle', 'Record touchpoints across email, phone, or meetings.')}
       >
         <form onSubmit={handleCreateActivity} className="space-y-4 text-xs">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Activity Type</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.activity_type', 'Activity Type')}</label>
               <select
                 value={activityForm.type}
                 onChange={e => setActivityForm({ ...activityForm, type: e.target.value as any })}
                 className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
               >
-                <option value="Call">Call</option>
-                <option value="Email">Email</option>
-                <option value="Meeting">Meeting</option>
-                <option value="Demo">Demo</option>
-                <option value="Note">Note</option>
-                <option value="Follow-up">Follow-up</option>
+                <option value="Call">{tActivityType('Call')}</option>
+                <option value="Email">{tActivityType('Email')}</option>
+                <option value="Meeting">{tActivityType('Meeting')}</option>
+                <option value="Demo">{tActivityType('Demo')}</option>
+                <option value="Note">{tActivityType('Note')}</option>
+                <option value="Follow-up">{tActivityType('Follow-up')}</option>
               </select>
             </div>
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Related Account</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.related_account', 'Related Account')}</label>
               <input
                 type="text"
                 placeholder="e.g. Quantum Health"
@@ -417,7 +419,7 @@ export const AppLayout: React.FC = () => {
             </div>
           </div>
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Subject / Title *</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.subject', 'Subject / Title')} *</label>
             <input
               type="text"
               required
@@ -428,7 +430,7 @@ export const AppLayout: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Discussion Notes</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.discussion_notes', 'Discussion Notes')}</label>
             <textarea
               rows={3}
               placeholder="Summary of customer requirements, milestones, or objections..."
@@ -443,13 +445,13 @@ export const AppLayout: React.FC = () => {
               onClick={() => setQuickActionType(null)}
               className="px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs"
             >
-              Record Activity
+              {t('modal.record_activity', 'Record Activity')}
             </button>
           </div>
         </form>

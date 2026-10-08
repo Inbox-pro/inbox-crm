@@ -21,8 +21,10 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { EmptyState } from '../components/common/EmptyState';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Tasks: React.FC = () => {
+  const { t, tStatus, tPriority } = useLanguage();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -129,14 +131,14 @@ export const Tasks: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Tasks & Follow-Ups
+              {t('tasks.title', 'Tasks & Follow-Ups')}
             </h1>
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              {total} scheduled
+              {total} {t('common.details', 'scheduled')}
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Operational action items, milestones, calls, and follow-ups.
+            {t('tasks.subtitle', 'Operational action items, milestones, calls, and follow-ups.')}
           </p>
         </div>
 
@@ -146,14 +148,14 @@ export const Tasks: React.FC = () => {
           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>New Task</span>
+          <span>{t('tasks.new_task', 'New Task')}</span>
         </button>
       </div>
 
       {/* Filter Bar */}
       <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex-1 min-w-[240px] max-w-sm">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search tasks, descriptions, accounts..." />
+          <SearchBar value={search} onChange={setSearch} placeholder={t('common.search', 'Search tasks, descriptions, accounts...')} />
         </div>
 
         <div className="flex items-center gap-2">
@@ -162,10 +164,10 @@ export const Tasks: React.FC = () => {
             onChange={(e) => setStatusFilter(e.target.value as any)}
             className="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-medium"
           >
-            <option value="All">All Statuses</option>
-            <option value="Pending">Pending</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
+            <option value="All">{t('tasks.all_statuses', 'All Statuses')}</option>
+            <option value="Pending">{tStatus('Pending')}</option>
+            <option value="In Progress">{tStatus('In Progress')}</option>
+            <option value="Completed">{tStatus('Completed')}</option>
           </select>
 
           <select
@@ -173,17 +175,18 @@ export const Tasks: React.FC = () => {
             onChange={(e) => setPriorityFilter(e.target.value as any)}
             className="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-medium"
           >
-            <option value="All">All Priorities</option>
-            <option value="Urgent">Urgent</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
+            <option value="All">{t('tasks.all_priorities', 'All Priorities')}</option>
+            <option value="Urgent">{tPriority('Urgent')}</option>
+            <option value="High">{tPriority('High')}</option>
+            <option value="Medium">{tPriority('Medium')}</option>
+            <option value="Low">{tPriority('Low')}</option>
           </select>
 
           <button
             type="button"
             onClick={fetchTasks}
             className="p-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+            title={t('common.refresh', 'Refresh list')}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -196,9 +199,9 @@ export const Tasks: React.FC = () => {
           <LoadingSkeleton count={pageSize} />
         ) : tasks.length === 0 ? (
           <EmptyState
-            title="No tasks found"
-            description="You are caught up! Create a new follow-up task to keep opportunities moving forward."
-            actionLabel="Schedule Task"
+            title={t('tasks.no_tasks', 'No tasks found')}
+            description={t('tasks.no_tasks_desc', 'You are caught up! Create a new follow-up task to keep opportunities moving forward.')}
+            actionLabel={t('tasks.schedule_task', 'Schedule Task')}
             onAction={() => setIsAddModalOpen(true)}
           />
         ) : (
@@ -341,18 +344,18 @@ export const Tasks: React.FC = () => {
                 onChange={e => setNewTask({ ...newTask, priority: e.target.value as any })}
                 className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
               >
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-                <option value="Urgent">Urgent</option>
+                <option value="Low">{tPriority('Low')}</option>
+                <option value="Medium">{tPriority('Medium')}</option>
+                <option value="High">{tPriority('High')}</option>
+                <option value="Urgent">{tPriority('Urgent')}</option>
               </select>
             </div>
           </div>
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Description</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('common.description', 'Description')}</label>
             <textarea
               rows={3}
-              placeholder="Optional notes or links to deliverables..."
+              placeholder={t('tasks.desc_placeholder', 'Optional notes or links to deliverables...')}
               value={newTask.description}
               onChange={e => setNewTask({ ...newTask, description: e.target.value })}
               className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
@@ -364,13 +367,13 @@ export const Tasks: React.FC = () => {
               onClick={() => setIsAddModalOpen(false)}
               className="px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs"
             >
-              Save Task
+              {t('modal.save_task', 'Save Task')}
             </button>
           </div>
         </form>
@@ -380,9 +383,9 @@ export const Tasks: React.FC = () => {
         isOpen={isConfirmDeleteOpen}
         onClose={() => setIsConfirmDeleteOpen(false)}
         onConfirm={handleDeleteConfirmed}
-        title="Delete Task"
-        message="Are you sure you want to remove this task?"
-        confirmLabel="Delete"
+        title={t('common.delete', 'Delete Task')}
+        message={t('tasks.confirm_delete', 'Are you sure you want to remove this task?')}
+        confirmLabel={t('common.delete', 'Delete')}
         isDestructive={true}
       />
     </div>

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageSelector } from '../components/common/LanguageSelector';
 import { InboxLogo } from '../components/common/InboxLogo';
 import {
   Lock,
@@ -24,6 +26,7 @@ export const Login: React.FC = () => {
   const { login, isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const { theme, toggleTheme } = useTheme();
+  const { t, tRole } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<'user' | 'admin'>('admin');
   const [email, setEmail] = useState('admin@inboxinfotech.com');
@@ -60,14 +63,14 @@ export const Login: React.FC = () => {
     const trimmedPass = password.trim();
 
     if (!trimmedEmail) {
-      const msg = 'Please enter your work email address';
+      const msg = t('login.email_required', 'Please enter your work email address');
       setErrorMessage(msg);
       showToast(msg, 'error');
       return;
     }
 
     if (!trimmedPass) {
-      const msg = 'Please enter your password';
+      const msg = t('login.pass_required', 'Please enter your password');
       setErrorMessage(msg);
       showToast(msg, 'error');
       return;
@@ -78,15 +81,15 @@ export const Login: React.FC = () => {
       const res = await login(trimmedEmail, trimmedPass, activeTab);
       if (res.success) {
         setErrorMessage(null);
-        showToast(res.message || 'Login successful! Welcome to Inbox CRM.', 'success');
+        showToast(t('login.success', 'Login successful! Welcome to Inbox CRM.'), 'success');
         navigate('/dashboard');
       } else {
-        const failureMsg = res.message || 'Invalid email or password. Please verify your credentials.';
+        const failureMsg = t('login.invalid', 'Invalid email or password. Please verify your credentials.');
         setErrorMessage(failureMsg);
         showToast(failureMsg, 'error');
       }
     } catch {
-      const err = 'An unexpected error occurred during authentication.';
+      const err = t('login.auth_failed', 'An unexpected error occurred during authentication.');
       setErrorMessage(err);
       showToast(err, 'error');
     } finally {
@@ -107,10 +110,10 @@ export const Login: React.FC = () => {
     try {
       const res = await login(targetEmail, targetPass, targetRole);
       if (res.success) {
-        showToast(`Signed in successfully as ${roleTitle}!`, 'success');
+        showToast(t('login.signed_in_as', `Signed in successfully as ${roleTitle}!`, { role: roleTitle }), 'success');
         navigate('/dashboard');
       } else {
-        const failureMsg = res.message || 'Sign in failed.';
+        const failureMsg = t('login.invalid', 'Sign in failed.');
         setErrorMessage(failureMsg);
         showToast(failureMsg, 'error');
       }
@@ -128,6 +131,7 @@ export const Login: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3">
+          <LanguageSelector />
           <button
             onClick={toggleTheme}
             id="theme-toggle-login"
@@ -139,7 +143,7 @@ export const Login: React.FC = () => {
           </button>
           <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 text-xs font-semibold">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Live Cloud Instance
+            {t('login.live_instance', 'Live Cloud Instance')}
           </div>
         </div>
       </header>
@@ -161,14 +165,14 @@ export const Login: React.FC = () => {
                     ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
                     : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
                 }`}>
-                  {activeTab === 'admin' ? 'Admin' : 'Staff'}
+                  {activeTab === 'admin' ? t('login.admin_tab', 'Admin') : t('login.staff_tab', 'Staff')}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {activeTab === 'admin' ? 'Administrator Portal' : 'Employee Workspace'}
+                {activeTab === 'admin' ? t('login.admin_portal', 'Administrator Portal') : t('login.employee_workspace', 'Employee Workspace')}
               </h1>
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
-                Sign in to access your Inbox Infotech CRM instance
+                {t('login.subtitle', 'Sign in to access your Inbox Infotech CRM instance')}
               </p>
             </div>
 
@@ -185,7 +189,7 @@ export const Login: React.FC = () => {
                 }`}
               >
                 <ShieldCheck className="w-4 h-4" />
-                <span>Admin Login</span>
+                <span>{t('login.admin_login', 'Admin Login')}</span>
               </button>
               <button
                 type="button"
@@ -198,7 +202,7 @@ export const Login: React.FC = () => {
                 }`}
               >
                 <UserCheck className="w-4 h-4" />
-                <span>Staff / User Login</span>
+                <span>{t('login.staff_login', 'Staff / User Login')}</span>
               </button>
             </div>
 
@@ -211,7 +215,7 @@ export const Login: React.FC = () => {
               >
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
                 <div className="flex-1">
-                  <p className="font-semibold text-rose-900 dark:text-rose-100">Authentication Failed</p>
+                  <p className="font-semibold text-rose-900 dark:text-rose-100">{t('login.auth_failed', 'Authentication Failed')}</p>
                   <p className="mt-0.5 opacity-90 leading-relaxed">{errorMessage}</p>
                 </div>
               </div>
@@ -222,7 +226,7 @@ export const Login: React.FC = () => {
               {/* Email */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                  Work Email
+                  {t('login.work_email', 'Work Email')}
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -245,14 +249,14 @@ export const Login: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                    Password
+                    {t('login.password', 'Password')}
                   </label>
                   <button
                     type="button"
                     onClick={() => showToast(`Registered password: ${activeTab === 'admin' ? 'admin@inbox2025' : 'sales@inbox2025'} (or demo1234)`, 'info')}
                     className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                   >
-                    Forgot password?
+                    {t('login.forgot_password', 'Forgot password?')}
                   </button>
                 </div>
                 <div className="relative">
@@ -266,7 +270,7 @@ export const Login: React.FC = () => {
                       if (errorMessage) setErrorMessage(null);
                     }}
                     required
-                    placeholder="Enter password"
+                    placeholder={t('login.enter_password', 'Enter password')}
                     className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-sm"
                   />
                   <button
@@ -284,7 +288,7 @@ export const Login: React.FC = () => {
                 <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 font-semibold mb-1">
                   <span className="flex items-center gap-1.5">
                     <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                    Demo Credentials Guide
+                    {t('login.credentials_guide', 'Demo Credentials Guide')}
                   </span>
                   <button
                     type="button"
@@ -297,19 +301,19 @@ export const Login: React.FC = () => {
                         setPassword('sales@inbox2025');
                       }
                       setErrorMessage(null);
-                      showToast('Credentials filled in form!', 'info');
+                      showToast(t('login.credentials_filled', 'Credentials filled in form!'), 'info');
                     }}
                     className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
                   >
-                    Auto-Fill
+                    {t('login.autofill', 'Auto-Fill')}
                   </button>
                 </div>
                 <div className="text-[11px] font-mono text-slate-600 dark:text-slate-400 space-y-0.5">
                   <div>
-                    Email: <span className="font-semibold text-slate-900 dark:text-slate-200 select-all">{activeTab === 'admin' ? 'admin@inboxinfotech.com' : 'sales@inboxinfotech.com'}</span>
+                    {t('login.work_email', 'Email')}: <span className="font-semibold text-slate-900 dark:text-slate-200 select-all">{activeTab === 'admin' ? 'admin@inboxinfotech.com' : 'sales@inboxinfotech.com'}</span>
                   </div>
                   <div>
-                    Password: <span className="font-semibold text-slate-900 dark:text-slate-200 select-all">{activeTab === 'admin' ? 'admin@inbox2025' : 'sales@inbox2025'}</span> (or <span className="select-all">demo1234</span>)
+                    {t('login.password', 'Password')}: <span className="font-semibold text-slate-900 dark:text-slate-200 select-all">{activeTab === 'admin' ? 'admin@inbox2025' : 'sales@inbox2025'}</span> (or <span className="select-all">demo1234</span>)
                   </div>
                 </div>
               </div>
@@ -323,10 +327,10 @@ export const Login: React.FC = () => {
                     onChange={(e) => setRememberMe(e.target.checked)}
                     className="w-4 h-4 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500"
                   />
-                  <span>Remember my login state</span>
+                  <span>{t('login.remember_me', 'Remember this device')}</span>
                 </label>
                 <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> 256-bit TLS Encrypted
+                  <CheckCircle2 className="w-3 h-3" /> {t('login.tls_encrypted', '256-bit TLS Encrypted')}
                 </span>
               </div>
 
@@ -341,7 +345,11 @@ export const Login: React.FC = () => {
                   <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    <span>Sign in as {activeTab === 'admin' ? 'Administrator' : 'Employee'}</span>
+                    <span>
+                      {t('login.sign_in_as', `Sign in as ${activeTab === 'admin' ? 'Administrator' : 'Employee'}`, {
+                        role: activeTab === 'admin' ? t('role.Admin', 'Administrator') : t('role.Sales', 'Employee'),
+                      })}
+                    </span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -353,9 +361,9 @@ export const Login: React.FC = () => {
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  1-Click Demo Logins
+                  {t('login.quick_demo_roles', '1-Click Demo Logins')}
                 </span>
-                <span className="text-[11px] text-blue-600 dark:text-blue-400">Pre-configured</span>
+                <span className="text-[11px] text-blue-600 dark:text-blue-400">{t('login.preconfigured', 'Pre-configured')}</span>
               </div>
 
               {activeTab === 'admin' ? (
@@ -369,12 +377,14 @@ export const Login: React.FC = () => {
                     <div>
                       <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                         <span>Tejas Chauhan</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-semibold">Super Admin</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-semibold">
+                          {tRole('Super Admin')}
+                        </span>
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400">admin@inboxinfotech.com</div>
                     </div>
                     <span className="text-xs font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-                      Log In <ArrowRight className="w-3 h-3" />
+                      {t('login.log_in', 'Log In')} <ArrowRight className="w-3 h-3" />
                     </span>
                   </button>
 
@@ -387,12 +397,14 @@ export const Login: React.FC = () => {
                     <div>
                       <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                         <span>Ananya Sharma</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold">Admin</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 font-semibold">
+                          {tRole('Admin')}
+                        </span>
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400">ananya@inboxinfotech.com</div>
                     </div>
                     <span className="text-xs font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-                      Log In <ArrowRight className="w-3 h-3" />
+                      {t('login.log_in', 'Log In')} <ArrowRight className="w-3 h-3" />
                     </span>
                   </button>
                 </div>
@@ -407,12 +419,14 @@ export const Login: React.FC = () => {
                     <div>
                       <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                         <span>Rohan Mehta</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-semibold">Sales</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-semibold">
+                          {tRole('Sales')}
+                        </span>
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400">sales@inboxinfotech.com</div>
                     </div>
                     <span className="text-xs font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-                      Log In <ArrowRight className="w-3 h-3" />
+                      {t('login.log_in', 'Log In')} <ArrowRight className="w-3 h-3" />
                     </span>
                   </button>
 
@@ -425,12 +439,14 @@ export const Login: React.FC = () => {
                     <div>
                       <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                         <span>Vikramaditya Rao</span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-semibold">Manager</span>
+                        <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 font-semibold">
+                          {tRole('Manager')}
+                        </span>
                       </div>
                       <div className="text-[11px] text-slate-500 dark:text-slate-400">manager@inboxinfotech.com</div>
                     </div>
                     <span className="text-xs font-medium text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
-                      Log In <ArrowRight className="w-3 h-3" />
+                      {t('login.log_in', 'Log In')} <ArrowRight className="w-3 h-3" />
                     </span>
                   </button>
                 </div>
@@ -442,7 +458,7 @@ export const Login: React.FC = () => {
 
       {/* Footer */}
       <footer className="w-full py-4 text-center text-xs text-slate-500 dark:text-slate-400">
-        © {new Date().getFullYear()} Inbox Infotech Pvt. Ltd. • All Rights Reserved • Enterprise CRM Solution
+        © {new Date().getFullYear()} Inbox Infotech Pvt. Ltd. • {t('login.rights_reserved', 'All Rights Reserved • Enterprise CRM Solution')}
       </footer>
     </div>
   );

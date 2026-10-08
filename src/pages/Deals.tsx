@@ -26,6 +26,7 @@ import { ConfirmDialog } from '../components/common/ConfirmDialog';
 import { EmptyState } from '../components/common/EmptyState';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 const STAGES: { id: DealStage; name: string; color: string; border: string }[] = [
   { id: 'New', name: 'Discovery', color: 'bg-slate-500', border: 'border-slate-300 dark:border-slate-700' },
@@ -37,6 +38,7 @@ const STAGES: { id: DealStage; name: string; color: string; border: string }[] =
 ];
 
 export const Deals: React.FC = () => {
+  const { t, tStage } = useLanguage();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
@@ -179,14 +181,14 @@ export const Deals: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Sales Pipeline & Kanban
+              {t('deals.title', 'Sales Pipeline & Kanban')}
             </h1>
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              {deals.length} opportunities
+              {deals.length} {t('common.details', 'opportunities')}
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Visualize deal velocity, stage progression, and revenue probability.
+            {t('deals.subtitle', 'Visualize deal velocity, stage progression, and revenue probability.')}
           </p>
         </div>
 
@@ -203,7 +205,7 @@ export const Deals: React.FC = () => {
               }`}
             >
               <KanbanIcon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Kanban</span>
+              <span className="hidden sm:inline">{t('deals.kanban', 'Kanban')}</span>
             </button>
             <button
               type="button"
@@ -215,7 +217,7 @@ export const Deals: React.FC = () => {
               }`}
             >
               <List className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">List</span>
+              <span className="hidden sm:inline">{t('deals.list', 'List')}</span>
             </button>
           </div>
 
@@ -227,7 +229,7 @@ export const Deals: React.FC = () => {
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors"
             >
               <Plus className="w-4 h-4" />
-              <span>Add Deal</span>
+              <span>{t('deals.new_deal', 'Add Deal')}</span>
             </button>
           )}
         </div>
@@ -236,7 +238,7 @@ export const Deals: React.FC = () => {
       {/* Filter Bar */}
       <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex-1 min-w-[240px] max-w-sm">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search deals, company, or contact..." />
+          <SearchBar value={search} onChange={setSearch} placeholder={t('common.search', 'Search deals, company, or contact...')} />
         </div>
 
         <div className="flex items-center gap-2">
@@ -245,13 +247,13 @@ export const Deals: React.FC = () => {
             onChange={(e) => setStageFilter(e.target.value as any)}
             className="px-2.5 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-300 font-medium"
           >
-            <option value="All">All Stages</option>
-            <option value="New">Discovery</option>
-            <option value="Qualified">Qualified</option>
-            <option value="Proposal">Proposal</option>
-            <option value="Negotiation">Negotiation</option>
-            <option value="Won">Won</option>
-            <option value="Lost">Lost</option>
+            <option value="All">{t('deals.all_stages', 'All Stages')}</option>
+            <option value="New">{tStage('New')}</option>
+            <option value="Qualified">{tStage('Qualified')}</option>
+            <option value="Proposal">{tStage('Proposal')}</option>
+            <option value="Negotiation">{tStage('Negotiation')}</option>
+            <option value="Won">{tStage('Won')}</option>
+            <option value="Lost">{tStage('Lost')}</option>
           </select>
           <button
             type="button"
@@ -282,7 +284,7 @@ export const Deals: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <span className={`w-2.5 h-2.5 rounded-full ${col.color}`} />
                       <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                        {col.name}
+                        {tStage(col.id)}
                       </h3>
                       <span className="text-[11px] font-semibold px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
                         {count}
@@ -471,7 +473,9 @@ export const Deals: React.FC = () => {
 
             {/* Pipeline Stage Stepper */}
             <div className="space-y-2">
-              <span className="font-bold text-slate-700 dark:text-slate-300">Advance Pipeline Stage:</span>
+              <span className="font-bold text-slate-700 dark:text-slate-300">
+                {t('deals.advance_stage', 'Advance Pipeline Stage:')}
+              </span>
               <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
                 {(['New', 'Qualified', 'Proposal', 'Negotiation', 'Won', 'Lost'] as DealStage[]).map((st) => (
                   <button
@@ -484,7 +488,7 @@ export const Deals: React.FC = () => {
                         : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
-                    {st}
+                    {tStage(st)}
                   </button>
                 ))}
               </div>
@@ -551,7 +555,7 @@ export const Deals: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Deal Value (₹) *</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.deal_value', 'Deal Value (₹)')} *</label>
               <input
                 type="number"
                 required
@@ -561,22 +565,22 @@ export const Deals: React.FC = () => {
               />
             </div>
             <div>
-              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Pipeline Stage</label>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.initial_stage', 'Pipeline Stage')}</label>
               <select
                 value={newDeal.stage}
                 onChange={e => setNewDeal({ ...newDeal, stage: e.target.value as any })}
                 className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
               >
-                <option value="New">Discovery</option>
-                <option value="Qualified">Qualified</option>
-                <option value="Proposal">Proposal</option>
-                <option value="Negotiation">Negotiation</option>
-                <option value="Won">Closed Won</option>
+                <option value="New">{tStage('New')}</option>
+                <option value="Qualified">{tStage('Qualified')}</option>
+                <option value="Proposal">{tStage('Proposal')}</option>
+                <option value="Negotiation">{tStage('Negotiation')}</option>
+                <option value="Won">{tStage('Won')}</option>
               </select>
             </div>
           </div>
           <div>
-            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Target Close Date</label>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">{t('modal.target_close_date', 'Target Close Date')}</label>
             <input
               type="date"
               value={newDeal.expectedCloseDate}
@@ -590,13 +594,13 @@ export const Deals: React.FC = () => {
               onClick={() => setIsAddModalOpen(false)}
               className="px-4 py-2 font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               className="px-4 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs"
             >
-              Create Opportunity
+              {t('modal.create_deal', 'Create Deal')}
             </button>
           </div>
         </form>
@@ -606,9 +610,9 @@ export const Deals: React.FC = () => {
         isOpen={isConfirmDeleteOpen}
         onClose={() => setIsConfirmDeleteOpen(false)}
         onConfirm={handleDeleteConfirmed}
-        title="Delete Opportunity"
-        message="Are you sure you want to permanently delete this deal from the sales pipeline?"
-        confirmLabel="Delete"
+        title={t('common.delete', 'Delete Opportunity')}
+        message={t('deals.confirm_delete', 'Are you sure you want to permanently delete this deal from the sales pipeline?')}
+        confirmLabel={t('common.delete', 'Delete')}
         isDestructive={true}
       />
     </div>

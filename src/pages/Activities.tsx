@@ -20,8 +20,10 @@ import { Modal } from '../components/common/Modal';
 import { EmptyState } from '../components/common/EmptyState';
 import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Activities: React.FC = () => {
+  const { t } = useLanguage();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -106,14 +108,14 @@ export const Activities: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Activity Stream & Audit Log
+              {t('activities.title', 'Activity Stream & Audit Log')}
             </h1>
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-              {total} touchpoints
+              {total} {t('common.details', 'touchpoints')}
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Complete chronology of calls, emails, product demos, meetings, and internal notes.
+            {t('activities.subtitle', 'Complete chronology of calls, emails, product demos, meetings, and internal notes.')}
           </p>
         </div>
 
@@ -123,14 +125,14 @@ export const Activities: React.FC = () => {
           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs transition-colors"
         >
           <Plus className="w-4 h-4" />
-          <span>Log Activity</span>
+          <span>{t('activities.log_activity', 'Log Activity')}</span>
         </button>
       </div>
 
       {/* Filters */}
       <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex-1 min-w-[240px] max-w-sm">
-          <SearchBar value={search} onChange={setSearch} placeholder="Search activity notes, accounts, reps..." />
+          <SearchBar value={search} onChange={setSearch} placeholder={t('common.search', 'Search activity notes, accounts, reps...')} />
         </div>
 
         <div className="flex items-center gap-2">

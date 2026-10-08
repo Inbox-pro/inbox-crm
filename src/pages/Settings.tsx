@@ -17,6 +17,8 @@ import {
 import { settingsService, OrganizationSettings, CustomFieldDefinition, ScoringRule } from '../services/settingsService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageSelector } from '../components/common/LanguageSelector';
 import { Avatar } from '../components/common/Avatar';
 import { Modal } from '../components/common/Modal';
 import { mockDb } from '../mock/db';
@@ -36,6 +38,7 @@ export const Settings: React.FC = () => {
 
   const { currentOrg, userRole, hasPermission } = useAuth();
   const { showToast } = useToast();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -109,10 +112,10 @@ export const Settings: React.FC = () => {
       {/* Page Header */}
       <div>
         <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-          System Administration & Settings
+          {t('settings.title', 'System Administration & Settings')}
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Configure tenant workspaces, user authorization roles, scoring heuristics, and integration endpoints.
+          {t('settings.subtitle', 'Configure tenant workspaces, user authorization roles, scoring heuristics, and integration endpoints.')}
         </p>
       </div>
 
@@ -233,6 +236,17 @@ export const Settings: React.FC = () => {
                 <option value="January">January (Calendar FY)</option>
               </select>
             </div>
+            <div>
+              <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                {t('settings.language_preference', 'Language & Locale')}
+              </label>
+              <div className="flex items-center gap-3">
+                <LanguageSelector />
+                <span className="text-xs text-slate-500 dark:text-slate-400">
+                  {t('settings.select_language', 'Select Interface Language')}
+                </span>
+              </div>
+            </div>
           </div>
 
           <button
@@ -240,7 +254,7 @@ export const Settings: React.FC = () => {
             className="px-4 py-2 font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
-            <span>Save Profile</span>
+            <span>{t('common.save', 'Save Profile')}</span>
           </button>
         </form>
       )}

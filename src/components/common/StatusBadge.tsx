@@ -1,5 +1,6 @@
 import React from 'react';
 import { LeadStatus, DealStage, TaskStatus } from '../../types';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface StatusBadgeProps {
   status: LeadStatus | DealStage | TaskStatus | string;
@@ -7,6 +8,8 @@ interface StatusBadgeProps {
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' }) => {
+  const { tStatus } = useLanguage();
+
   const getColors = () => {
     switch (status) {
       // Lead statuses
@@ -53,7 +56,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'sm' })
       className={`inline-flex items-center gap-1.5 font-medium rounded-full border whitespace-nowrap ${pad} ${getColors()}`}
     >
       <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70" />
-      {status}
+      {tStatus(status)}
     </span>
   );
 };

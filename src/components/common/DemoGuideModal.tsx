@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal } from './Modal';
 import { CheckCircle2, ArrowRight, Sparkles, Building2, Users2, Brain, Kanban, BarChart3, Settings2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface DemoGuideModalProps {
   isOpen: boolean;
@@ -10,55 +11,56 @@ interface DemoGuideModalProps {
 
 export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const steps = [
     {
       num: '1',
-      title: 'Multi-Tenant Workspace & RBAC',
+      title: t('guide.step1_title', 'Multi-Tenant Workspace & RBAC'),
       icon: Building2,
-      desc: 'Use the top-right switcher to switch between organizations (Nexus Corp, Apex, Starlight) or toggle roles (Super Admin, Manager, Sales, Viewer) to demo strict permission boundaries.',
+      desc: t('guide.step1_desc', 'Use the top-right switcher to switch between organizations (Nexus Corp, Apex, Starlight) or toggle roles (Super Admin, Manager, Sales, Viewer) to demo strict permission boundaries.'),
       actionRoute: '/settings',
-      actionText: 'View Tenant Settings',
+      actionText: t('guide.step1_action', 'View Tenant Settings'),
     },
     {
       num: '2',
-      title: 'Executive Dashboard & Financial KPIs',
+      title: t('guide.step2_title', 'Executive Dashboard & Financial KPIs'),
       icon: BarChart3,
-      desc: 'Highlight ₹42.8L in active pipeline, ₹18.4L in won revenue, real-time conversion rates, sales rep leaderboard, and one-click filtering by date ranges.',
+      desc: t('guide.step2_desc', 'Highlight ₹42.8L in active pipeline, ₹18.4L in won revenue, real-time conversion rates, sales rep leaderboard, and one-click filtering by date ranges.'),
       actionRoute: '/dashboard',
-      actionText: 'Go to Dashboard',
+      actionText: t('guide.step2_action', 'Go to Dashboard'),
     },
     {
       num: '3',
-      title: 'AI Lead Scoring & 1-Click Conversion',
+      title: t('guide.step3_title', 'AI Lead Scoring & 1-Click Conversion'),
       icon: Users2,
-      desc: 'Navigate to Leads. Inspect Sunita Menon (87/100 score). Click "Convert" to instantly generate an associated Contact, Company, and a ₹8L Deal record.',
+      desc: t('guide.step3_desc', 'Navigate to Leads. Inspect Sunita Menon (87/100 score). Click "Convert" to instantly generate an associated Contact, Company, and a ₹8L Deal record.'),
       actionRoute: '/leads',
-      actionText: 'Explore Leads',
+      actionText: t('guide.step3_action', 'Explore Leads'),
     },
     {
       num: '4',
-      title: 'Interactive Sales Kanban Pipeline',
+      title: t('guide.step4_title', 'Interactive Sales Kanban Pipeline'),
       icon: Kanban,
-      desc: 'Demonstrate drag-and-drop deal progression through stages (Qualified → Proposal → Negotiation → Won). Watch win probability and timeline recalculate dynamically.',
+      desc: t('guide.step4_desc', 'Demonstrate drag-and-drop deal progression through stages (Qualified → Proposal → Negotiation → Won). Watch win probability and timeline recalculate dynamically.'),
       actionRoute: '/deals',
-      actionText: 'Open Deals Kanban',
+      actionText: t('guide.step4_action', 'Open Deals Kanban'),
     },
     {
       num: '5',
-      title: 'NexusAI Assistant In Action',
+      title: t('guide.step5_title', 'Inbox AI Assistant In Action'),
       icon: Brain,
-      desc: 'Click on NexusAI in the sidebar. Click suggested prompt "Which deals need attention today?" or "Create a follow-up task for Rahul tomorrow" to see actionable CRM intelligence.',
+      desc: t('guide.step5_desc', 'Click on AI Assistant in the sidebar. Click suggested prompt "Which deals need attention today?" or "Create a follow-up task for Rahul tomorrow" to see actionable CRM intelligence.'),
       actionRoute: '/ai-assistant',
-      actionText: 'Launch AI Assistant',
+      actionText: t('guide.step5_action', 'Launch AI Assistant'),
     },
     {
       num: '6',
-      title: 'Generic Customization Engine',
+      title: t('guide.step6_title', 'Generic Customization Engine'),
       icon: Settings2,
-      desc: 'Show how NexusCRM adapts to healthcare, manufacturing, or finance by adding custom fields and editing pipeline stages without changing code.',
+      desc: t('guide.step6_desc', 'Show how Inbox CRM adapts to healthcare, manufacturing, or finance by adding custom fields and editing pipeline stages without changing code.'),
       actionRoute: '/settings',
-      actionText: 'Custom Fields & Stages',
+      actionText: t('guide.step6_action', 'Custom Fields & Stages'),
     },
   ];
 
@@ -66,15 +68,15 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="NexusCRM Client Demonstration Guide"
-      subtitle="Follow this proven 6-step walkthrough script to present a compelling SaaS demonstration to prospects or investors."
+      title={t('guide.title', 'Inbox CRM Client Demonstration Guide')}
+      subtitle={t('guide.subtitle', 'Follow this proven 6-step walkthrough script to present a compelling SaaS demonstration to prospects or investors.')}
       maxWidth="2xl"
     >
       <div className="space-y-4">
         <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/50 rounded-xl flex items-center gap-3">
           <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
           <p className="text-xs text-blue-900 dark:text-blue-200 leading-relaxed">
-            <strong>Demonstration Tip:</strong> All data in this application is live and interactive in local memory. You can create records, drag deals, and log activities safely.
+            {t('guide.tip', 'Demonstration Tip: All data in this application is live and interactive in local memory. You can create records, drag deals, and log activities safely.')}
           </p>
         </div>
 
@@ -126,7 +128,7 @@ export const DemoGuideModal: React.FC<DemoGuideModalProps> = ({ isOpen, onClose 
             onClick={onClose}
             className="px-4 py-2 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 rounded-lg transition-colors"
           >
-            Got It, Let's Demo
+            {t('guide.got_it', "Got It, Let's Demo")}
           </button>
         </div>
       </div>

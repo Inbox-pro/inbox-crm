@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Activity, ActivityType } from '../../types';
 import { Phone, Mail, Calendar, FileText, CheckCircle2, UserCheck, Plus, Clock } from 'lucide-react';
 import { Avatar } from './Avatar';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface TimelineProps {
   activities: Activity[];
@@ -23,6 +24,7 @@ export const Timeline: React.FC<TimelineProps> = ({
   onAddActivity,
   relatedEntity,
 }) => {
+  const { t, tActivityType, language } = useLanguage();
   const [isAdding, setIsAdding] = useState(false);
   const [type, setType] = useState<ActivityType>('Note');
   const [title, setTitle] = useState('');
@@ -95,12 +97,14 @@ export const Timeline: React.FC<TimelineProps> = ({
     setIsAdding(false);
   };
 
+  const dateLocale = language === 'de' ? 'de-DE' : language === 'nl' ? 'nl-NL' : 'en-US';
+
   return (
     <div className="space-y-6">
       {/* Activity Logger Header */}
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">
-          Activity Timeline ({activities.length})
+          {t('activities.timeline', 'Activity Timeline')} ({activities.length})
         </h4>
         {onAddActivity && !isAdding && (
           <button
@@ -109,7 +113,7 @@ export const Timeline: React.FC<TimelineProps> = ({
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-950/50 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
-            Log Activity
+            {t('header.log_activity', 'Log Activity')}
           </button>
         )}
       </div>
@@ -118,20 +122,22 @@ export const Timeline: React.FC<TimelineProps> = ({
       {isAdding && (
         <form onSubmit={handleSave} className="p-4 rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/40 dark:bg-blue-950/20 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">New Activity Log</span>
+            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              {t('modal.log_activity_title', 'New Activity Log')}
+            </span>
             <div className="flex gap-1">
-              {(['Note', 'Call', 'Email', 'Meeting', 'Demo'] as ActivityType[]).map((t) => (
+              {(['Note', 'Call', 'Email', 'Meeting', 'Demo'] as ActivityType[]).map((tType) => (
                 <button
-                  key={t}
+                  key={tType}
                   type="button"
-                  onClick={() => setType(t)}
+                  onClick={() => setType(tType)}
                   className={`px-2.5 py-1 text-xs rounded-md transition-colors ${
-                    type === t
+                    type === tType
                       ? 'bg-blue-600 text-white font-medium shadow-xs'
                       : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'
                   }`}
                 >
-                  {t}
+                  {tActivityType(tType)}
                 </button>
               ))}
             </div>
@@ -140,7 +146,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           <input
             type="text"
             required
-            placeholder="Summary / Title (e.g. Discovery call with executive)"
+            placeholder={t('modal.subject', 'Summary / Title (e.g. Discovery call with executive)')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full px-3 py-1.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
@@ -148,7 +154,7 @@ export const Timeline: React.FC<TimelineProps> = ({
 
           <textarea
             rows={2}
-            placeholder="Notes, discussion topics, next steps..."
+            placeholder={t('modal.discussion_notes', 'Notes, discussion topics, next steps...')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             className="w-full px-3 py-1.5 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
@@ -157,7 +163,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <input
               type="text"
-              placeholder="Outcome / Agreement"
+              placeholder={t('activities.outcome', 'Outcome / Agreement')}
               value={outcome}
               onChange={(e) => setOutcome(e.target.value)}
               className="px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white placeholder-slate-400"
@@ -165,16 +171,16 @@ export const Timeline: React.FC<TimelineProps> = ({
             {(type === 'Call' || type === 'Meeting' || type === 'Demo') && (
               <div className="flex items-center gap-2">
                 <Clock className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-xs text-slate-500">Duration:</span>
+                <span className="text-xs text-slate-500">{t('activities.duration', 'Duration:')}</span>
                 <select
                   value={duration}
                   onChange={(e) => setDuration(Number(e.target.value))}
                   className="px-2 py-1 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
                 >
-                  <option value={15}>15 mins</option>
-                  <option value={30}>30 mins</option>
-                  <option value={45}>45 mins</option>
-                  <option value={60}>60 mins</option>
+                  <option value={15}>15 {t('activities.mins', 'mins')}</option>
+                  <option value={30}>30 {t('activities.mins', 'mins')}</option>
+                  <option value={45}>45 {t('activities.mins', 'mins')}</option>
+                  <option value={60}>60 {t('activities.mins', 'mins')}</option>
                 </select>
               </div>
             )}
@@ -186,13 +192,13 @@ export const Timeline: React.FC<TimelineProps> = ({
               onClick={() => setIsAdding(false)}
               className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             >
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </button>
             <button
               type="submit"
               className="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-xs"
             >
-              Record Activity
+              {t('modal.record_activity', 'Record Activity')}
             </button>
           </div>
         </form>
@@ -202,7 +208,7 @@ export const Timeline: React.FC<TimelineProps> = ({
       <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
         {activities.length === 0 ? (
           <div className="text-xs text-slate-500 dark:text-slate-400 py-4">
-            No logged activities yet. Click 'Log Activity' to record meetings, calls, or notes.
+            {t('activities.no_activities_hint', "No logged activities yet. Click 'Log Activity' to record meetings, calls, or notes.")}
           </div>
         ) : (
           activities.map((act) => (
@@ -221,14 +227,14 @@ export const Timeline: React.FC<TimelineProps> = ({
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                      {act.type}
+                      {tActivityType(act.type)}
                     </span>
                     <h5 className="text-sm font-semibold text-slate-900 dark:text-white">
                       {act.title}
                     </h5>
                   </div>
                   <span className="text-xs text-slate-400 font-mono">
-                    {new Date(act.occurredAt).toLocaleDateString('en-US', {
+                    {new Date(act.occurredAt).toLocaleDateString(dateLocale, {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric',
@@ -242,7 +248,9 @@ export const Timeline: React.FC<TimelineProps> = ({
 
                 {act.outcome && (
                   <div className="mt-2 text-xs bg-slate-50 dark:bg-slate-800/60 p-2 rounded-lg text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-800">
-                    <span className="font-semibold text-slate-900 dark:text-white">Outcome: </span>
+                    <span className="font-semibold text-slate-900 dark:text-white">
+                      {t('activities.outcome_label', 'Outcome')}:{' '}
+                    </span>
                     {act.outcome}
                   </div>
                 )}
@@ -255,7 +263,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                   {act.durationMinutes && (
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {act.durationMinutes} mins
+                      {act.durationMinutes} {t('activities.mins', 'mins')}
                     </span>
                   )}
                 </div>
