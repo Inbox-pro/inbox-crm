@@ -1,0 +1,13 @@
+{
+  "mode": "standard",
+  "phase_id_convention": "sequential",
+  "granularity": "Standard",
+  "model_profile": "balanced",
+  "workflow": {
+    "research": true,
+    "plan_check": true,
+    "verifier": true,
+    "branching": false
+  }
+}
+

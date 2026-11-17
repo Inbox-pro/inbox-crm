@@ -13,6 +13,7 @@ interface AuthContextType {
   isLoading: boolean;
   hasPermission: (permission: Permission) => boolean;
   login: (email: string, password?: string, targetRole?: 'admin' | 'user' | Role) => Promise<{ success: boolean; message?: string }>;
+  register: (data: { name: string; email: string; password: string; role?: Role; department?: string }) => Promise<{ success: boolean; message?: string }>;
   logout: () => Promise<void>;
   switchRole: (role: Role) => Promise<void>;
   switchUser: (userId: string) => Promise<void>;
@@ -75,6 +76,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  const register = async (data: {
+    name: string;
+    email: string;
+    password: string;
+    role?: Role;
+    department?: string;
+  }) => {
+    const res = await authService.register(data, { autoLogin: true });
+    if (res.success && res.data) {
+      setCurrentUser(res.data);
+      setIsAuthenticated(true);
+      return { success: true, message: res.message };
+    }
+    return {
+      success: false,
+      message: res.message || 'Registration failed.',
+    };
+  };
+
   const logout = async () => {
     await authService.logout();
     setCurrentUser(null);
@@ -109,6 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         hasPermission,
         login,
+        register,
         logout,
         switchRole,
         switchUser,

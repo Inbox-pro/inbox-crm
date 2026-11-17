@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
 import { settingsService, OrganizationSettings } from '../services/settingsService';
+import { authService } from '../services/authService';
 import { mockDb } from '../mock/db';
 import { Role } from '../types';
 import {
@@ -59,7 +60,9 @@ export const AdminPanel: React.FC = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [newUserName, setNewUserName] = useState('');
   const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('Welcome@2026!');
   const [newUserRole, setNewUserRole] = useState<Role>('Sales');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isAdmin = role === 'Super Admin' || role === 'Admin';
 
@@ -70,9 +73,23 @@ export const AdminPanel: React.FC = () => {
   const loadSettings = async () => {
     setIsLoading(false);
     try {
-      const res = await settingsService.getSettings();
-      if (res.success) {
-        setSettings(res.data);
+      const [res, usersRes] = await Promise.all([
+        settingsService.getSettings(),
+        authService.getUsers(),
+      ]);
+
+      if (res.success && res.data) {
+        let loadedUsers = res.data.users;
+        if (usersRes.success && Array.isArray(usersRes.data) && usersRes.data.length > 0) {
+          loadedUsers = usersRes.data.map(u => ({
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            role: u.role,
+            status: u.status || 'Active',
+          }));
+        }
+        setSettings({ ...res.data, users: loadedUsers });
       }
     } catch {
       // Fallback
@@ -115,32 +132,58 @@ export const AdminPanel: React.FC = () => {
     showToast('Employee status toggled', 'info');
   };
 
-  const handleCreateUser = (e: React.FormEvent) => {
+  const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!settings || !newUserName.trim() || !newUserEmail.trim()) {
+    if (!newUserName.trim() || !newUserEmail.trim()) {
       showToast('Please fill out employee name and email', 'error');
       return;
     }
 
-    const newUser = {
-      id: `usr_${Date.now()}`,
-      name: newUserName.trim(),
-      email: newUserEmail.trim(),
-      role: newUserRole,
-      status: 'Active' as const,
-    };
+    setIsSubmitting(true);
+    try {
+      // Register into MongoDB Atlas & local usersDb via Express API
+      const res = await authService.register(
+        {
+          name: newUserName.trim(),
+          email: newUserEmail.trim(),
+          password: newUserPassword.trim() || 'Welcome@2026!',
+          role: newUserRole,
+          department: 'Sales Operations',
+        },
+        { autoLogin: false }
+      );
 
-    const newSettings = {
-      ...settings,
-      users: [...settings.users, newUser],
-    };
-    setSettings(newSettings);
-    settingsService.updateSettings(newSettings);
+      if (res.success && res.data) {
+        showToast(`Registered ${res.data.name} in MongoDB Atlas database!`, 'success');
 
-    setIsAddUserOpen(false);
-    setNewUserName('');
-    setNewUserEmail('');
-    showToast(`Added ${newUser.name} as ${newUser.role}`, 'success');
+        if (settings) {
+          const newUser = {
+            id: res.data.id,
+            name: res.data.name,
+            email: res.data.email,
+            role: res.data.role,
+            status: 'Active' as const,
+          };
+          const newSettings = {
+            ...settings,
+            users: [newUser, ...settings.users.filter(u => u.email !== newUser.email)],
+          };
+          setSettings(newSettings);
+          settingsService.updateSettings(newSettings);
+        }
+
+        setIsAddUserOpen(false);
+        setNewUserName('');
+        setNewUserEmail('');
+        setNewUserPassword('Welcome@2026!');
+      } else {
+        showToast(res.message || 'Failed to register user.', 'error');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Error communicating with database.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleExportDatabase = () => {
@@ -552,6 +595,22 @@ export const AdminPanel: React.FC = () => {
               </div>
 
               <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                    Password (Min 8 chars, 1 Upper, 1 Lower, 1 Num, 1 Symbol)
+                  </label>
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={newUserPassword}
+                  onChange={(e) => setNewUserPassword(e.target.value)}
+                  placeholder="Welcome@2026!"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm text-slate-900 dark:text-white font-mono"
+                />
+              </div>
+
+              <div>
                 <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                   System Role
                 </label>
@@ -578,9 +637,10 @@ export const AdminPanel: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm"
+                  disabled={isSubmitting}
+                  className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm disabled:opacity-50"
                 >
-                  Save Employee
+                  {isSubmitting ? 'Saving to Database...' : 'Save Employee'}
                 </button>
               </div>
             </form>
