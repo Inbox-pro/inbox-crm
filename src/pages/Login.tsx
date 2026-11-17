@@ -11,6 +11,7 @@ import {
   Mail,
   ShieldCheck,
   UserCheck,
+  UserPlus,
   Eye,
   EyeOff,
   ArrowRight,
@@ -19,22 +20,31 @@ import {
   CheckCircle2,
   Sparkles,
   AlertCircle,
+  Briefcase,
+  User as UserIcon,
 } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+  const { login, register, isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const { theme, toggleTheme } = useTheme();
   const { t, tRole } = useLanguage();
 
-  const [activeTab, setActiveTab] = useState<'user' | 'admin'>('admin');
+  const [activeTab, setActiveTab] = useState<'user' | 'admin' | 'register'>('admin');
   const [email, setEmail] = useState('admin@inboxinfotech.com');
   const [password, setPassword] = useState('admin@inbox2025');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Registration state
+  const [regName, setRegName] = useState('');
+  const [regEmail, setRegEmail] = useState('');
+  const [regPassword, setRegPassword] = useState('Welcome@2026!');
+  const [regRole, setRegRole] = useState<'Sales' | 'Manager' | 'Admin'>('Sales');
+  const [regDepartment, setRegDepartment] = useState('Sales Operations');
 
   // If already authenticated, redirect directly to dashboard
   React.useEffect(() => {
@@ -43,13 +53,13 @@ export const Login: React.FC = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleTabChange = (tab: 'user' | 'admin') => {
+  const handleTabChange = (tab: 'user' | 'admin' | 'register') => {
     setActiveTab(tab);
     setErrorMessage(null);
     if (tab === 'admin') {
       setEmail('admin@inboxinfotech.com');
       setPassword('admin@inbox2025');
-    } else {
+    } else if (tab === 'user') {
       setEmail('sales@inboxinfotech.com');
       setPassword('sales@inbox2025');
     }
@@ -58,6 +68,60 @@ export const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+
+    if (activeTab === 'register') {
+      const trimmedName = regName.trim();
+      const trimmedEmail = regEmail.trim();
+      const trimmedPass = regPassword.trim();
+
+      if (!trimmedName) {
+        const msg = 'Please enter your full name';
+        setErrorMessage(msg);
+        showToast(msg, 'error');
+        return;
+      }
+
+      if (!trimmedEmail) {
+        const msg = 'Please enter your work email address';
+        setErrorMessage(msg);
+        showToast(msg, 'error');
+        return;
+      }
+
+      if (!trimmedPass) {
+        const msg = 'Please enter a password';
+        setErrorMessage(msg);
+        showToast(msg, 'error');
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const res = await register({
+          name: trimmedName,
+          email: trimmedEmail,
+          password: trimmedPass,
+          role: regRole,
+          department: regDepartment.trim() || 'Sales Operations',
+        });
+
+        if (res.success) {
+          setErrorMessage(null);
+          showToast(`Account created and saved in MongoDB Atlas! Welcome, ${trimmedName}!`, 'success');
+          navigate('/dashboard');
+        } else {
+          setErrorMessage(res.message || 'Registration failed.');
+          showToast(res.message || 'Registration failed.', 'error');
+        }
+      } catch (err: any) {
+        const msg = err.message || 'An unexpected error occurred during account registration.';
+        setErrorMessage(msg);
+        showToast(msg, 'error');
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
 
     const trimmedEmail = email.trim();
     const trimmedPass = password.trim();
@@ -163,46 +227,67 @@ export const Login: React.FC = () => {
                 <span className={`absolute -bottom-1.5 -right-1.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border shadow-xs ${
                   activeTab === 'admin'
                     ? 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                    : activeTab === 'register'
+                    ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
                     : 'bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
                 }`}>
-                  {activeTab === 'admin' ? t('login.admin_tab', 'Admin') : t('login.staff_tab', 'Staff')}
+                  {activeTab === 'admin' ? t('login.admin_tab', 'Admin') : activeTab === 'register' ? 'Register' : t('login.staff_tab', 'Staff')}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {activeTab === 'admin' ? t('login.admin_portal', 'Administrator Portal') : t('login.employee_workspace', 'Employee Workspace')}
+                {activeTab === 'admin'
+                  ? t('login.admin_portal', 'Administrator Portal')
+                  : activeTab === 'register'
+                  ? 'Create New Account'
+                  : t('login.employee_workspace', 'Employee Workspace')}
               </h1>
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
-                {t('login.subtitle', 'Sign in to access your Inbox Infotech CRM instance')}
+                {activeTab === 'register'
+                  ? 'Register new user and save directly to MongoDB Atlas database'
+                  : t('login.subtitle', 'Sign in to access your Inbox Infotech CRM instance')}
               </p>
             </div>
 
-            {/* Mode Switcher Tabs: User Login vs Admin Login */}
-            <div className="grid grid-cols-2 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 mb-6 border border-slate-200/70 dark:border-slate-700/60">
+            {/* Mode Switcher Tabs: Admin vs Staff vs Register */}
+            <div className="grid grid-cols-3 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80 mb-6 border border-slate-200/70 dark:border-slate-700/60">
               <button
                 type="button"
                 id="login-tab-admin"
                 onClick={() => handleTabChange('admin')}
-                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                className={`py-2 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
                   activeTab === 'admin'
                     ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/60 dark:border-slate-700'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <ShieldCheck className="w-4 h-4" />
-                <span>{t('login.admin_login', 'Admin Login')}</span>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>{t('login.admin_tab', 'Admin')}</span>
               </button>
               <button
                 type="button"
                 id="login-tab-user"
                 onClick={() => handleTabChange('user')}
-                className={`py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+                className={`py-2 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
                   activeTab === 'user'
                     ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-sm border border-slate-200/60 dark:border-slate-700'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <UserCheck className="w-4 h-4" />
-                <span>{t('login.staff_login', 'Staff / User Login')}</span>
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>{t('login.staff_tab', 'Staff')}</span>
+              </button>
+              <button
+                type="button"
+                id="login-tab-register"
+                onClick={() => handleTabChange('register')}
+                className={`py-2 px-2 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
+                  activeTab === 'register'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/60 dark:border-slate-700'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>Register</span>
               </button>
             </div>
 
@@ -223,148 +308,305 @@ export const Login: React.FC = () => {
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-                  {t('login.work_email', 'Work Email')}
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="email"
-                    id="login-email-input"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (errorMessage) setErrorMessage(null);
-                    }}
-                    required
-                    placeholder="name@inboxinfotech.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-sm"
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-                    {t('login.password', 'Password')}
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => showToast(`Registered password: ${activeTab === 'admin' ? 'admin@inbox2025' : 'sales@inbox2025'} (or demo1234)`, 'info')}
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    {t('login.forgot_password', 'Forgot password?')}
-                  </button>
-                </div>
-                <div className="relative">
-                  <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="login-password-input"
-                    value={password}
-                    onChange={(e) => {
-                      setPassword(e.target.value);
-                      if (errorMessage) setErrorMessage(null);
-                    }}
-                    required
-                    placeholder={t('login.enter_password', 'Enter password')}
-                    className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Verified Credentials Helper Callout */}
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs">
-                <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 font-semibold mb-1">
-                  <span className="flex items-center gap-1.5">
-                    <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                    {t('login.credentials_guide', 'Demo Credentials Guide')}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (activeTab === 'admin') {
-                        setEmail('admin@inboxinfotech.com');
-                        setPassword('admin@inbox2025');
-                      } else {
-                        setEmail('sales@inboxinfotech.com');
-                        setPassword('sales@inbox2025');
-                      }
-                      setErrorMessage(null);
-                      showToast(t('login.credentials_filled', 'Credentials filled in form!'), 'info');
-                    }}
-                    className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
-                  >
-                    {t('login.autofill', 'Auto-Fill')}
-                  </button>
-                </div>
-                <div className="text-[11px] font-mono text-slate-600 dark:text-slate-400 space-y-0.5">
+              {activeTab === 'register' ? (
+                <>
+                  {/* Registration Full Name */}
                   <div>
-                    {t('login.work_email', 'Email')}: <span className="font-semibold text-slate-900 dark:text-slate-200 select-all">{activeTab === 'admin' ? 'admin@inboxinfotech.com' : 'sales@inboxinfotech.com'}</span>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Full Name *
+                    </label>
+                    <div className="relative">
+                      <UserIcon className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        id="register-name-input"
+                        value={regName}
+                        onChange={(e) => {
+                          setRegName(e.target.value);
+                          if (errorMessage) setErrorMessage(null);
+                        }}
+                        required
+                        placeholder="e.g. Shalini Nair"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all text-sm"
+                      />
+                    </div>
                   </div>
+
+                  {/* Registration Email */}
                   <div>
-                    {t('login.password', 'Password')}: <span className="font-semibold text-slate-900 dark:text-slate-200 select-all">{activeTab === 'admin' ? 'admin@inbox2025' : 'sales@inbox2025'}</span> (or <span className="select-all">demo1234</span>)
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Work Email *
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="email"
+                        id="register-email-input"
+                        value={regEmail}
+                        onChange={(e) => {
+                          setRegEmail(e.target.value);
+                          if (errorMessage) setErrorMessage(null);
+                        }}
+                        required
+                        placeholder="shalini@inboxinfotech.com"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all text-sm"
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Remember Me */}
-              <div className="flex items-center justify-between pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-600 dark:text-slate-400 select-none">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span>{t('login.remember_me', 'Remember this device')}</span>
-                </label>
-                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> {t('login.tls_encrypted', '256-bit TLS Encrypted')}
-                </span>
-              </div>
+                  {/* Role & Department */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                        Access Role
+                      </label>
+                      <select
+                        id="register-role-select"
+                        value={regRole}
+                        onChange={(e) => setRegRole(e.target.value as any)}
+                        className="w-full px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all text-sm"
+                      >
+                        <option value="Sales">Sales Rep</option>
+                        <option value="Manager">Manager</option>
+                        <option value="Admin">Admin</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                        Department
+                      </label>
+                      <div className="relative">
+                        <Briefcase className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="text"
+                          id="register-dept-input"
+                          value={regDepartment}
+                          onChange={(e) => setRegDepartment(e.target.value)}
+                          placeholder="Sales"
+                          className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                id="login-submit-btn"
-                disabled={isLoading}
-                className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-70 cursor-pointer"
-              >
-                {isLoading ? (
-                  <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <span>
-                      {t('login.sign_in_as', `Sign in as ${activeTab === 'admin' ? 'Administrator' : 'Employee'}`, {
-                        role: activeTab === 'admin' ? t('role.Admin', 'Administrator') : t('role.Sales', 'Employee'),
-                      })}
+                  {/* Password */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      Password *
+                    </label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        id="register-password-input"
+                        value={regPassword}
+                        onChange={(e) => {
+                          setRegPassword(e.target.value);
+                          if (errorMessage) setErrorMessage(null);
+                        }}
+                        required
+                        placeholder="e.g. Welcome@2026!"
+                        className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition-all text-sm font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <div className="mt-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-400">
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">Password Policy: </span>
+                      Must be ≥8 chars with uppercase, lowercase, number, and special character (!@#$%^&*).
+                    </div>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    id="register-submit-btn"
+                    disabled={isLoading}
+                    className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-sm shadow-md shadow-emerald-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-70 cursor-pointer"
+                  >
+                    {isLoading ? (
+                      <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span>Create Account & Sign In</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => handleTabChange('admin')}
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                    >
+                      Already have an account? Sign in here
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Email */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+                      {t('login.work_email', 'Work Email')}
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="email"
+                        id="login-email-input"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (errorMessage) setErrorMessage(null);
+                        }}
+                        required
+                        placeholder="name@inboxinfotech.com"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                        {t('login.password', 'Password')}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => showToast(`Registered password: ${activeTab === 'admin' ? 'admin@inbox2025' : 'sales@inbox2025'} (or demo1234)`, 'info')}
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        {t('login.forgot_password', 'Forgot password?')}
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        id="login-password-input"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          if (errorMessage) setErrorMessage(null);
+                        }}
+                        required
+                        placeholder={t('login.enter_password', 'Enter password')}
+                        className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-950/50 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Verified Credentials Helper Callout */}
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs">
+                    <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 font-semibold mb-1">
+                      <span className="flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                        {t('login.credentials_guide', 'Demo Credentials Guide')}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (activeTab === 'admin') {
+                            setEmail('admin@inboxinfotech.com');
+                            setPassword('admin@inbox2025');
+                          } else {
+                            setEmail('sales@inboxinfotech.com');
+                            setPassword('sales@inbox2025');
+                          }
+                          setErrorMessage(null);
+                          showToast(t('login.credentials_filled', 'Credentials filled in form!'), 'info');
+                        }}
+                        className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        {t('login.autofill', 'Auto-Fill')}
+                      </button>
+                    </div>
+                    <div className="text-[11px] font-mono text-slate-600 dark:text-slate-400 space-y-0.5">
+                      <div>
+                        {t('login.work_email', 'Email')}: <span className="font-semibold text-slate-900 dark:text-slate-200 select-all">{activeTab === 'admin' ? 'admin@inboxinfotech.com' : 'sales@inboxinfotech.com'}</span>
+                      </div>
+                      <div>
+                        {t('login.password', 'Password')}: <span className="font-semibold text-slate-900 dark:text-slate-200 select-all">{activeTab === 'admin' ? 'admin@inbox2025' : 'sales@inbox2025'}</span> (or <span className="select-all">demo1234</span>)
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Remember Me */}
+                  <div className="flex items-center justify-between pt-1">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-600 dark:text-slate-400 select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="w-4 h-4 rounded-sm border-slate-300 dark:border-slate-700 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span>{t('login.remember_me', 'Remember this device')}</span>
+                    </label>
+                    <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> {t('login.tls_encrypted', '256-bit TLS Encrypted')}
                     </span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    id="login-submit-btn"
+                    disabled={isLoading}
+                    className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-md shadow-blue-500/20 flex items-center justify-center gap-2 transition-all active:scale-[0.99] disabled:opacity-70 cursor-pointer"
+                  >
+                    {isLoading ? (
+                      <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span>
+                          {t('login.sign_in_as', `Sign in as ${activeTab === 'admin' ? 'Administrator' : 'Employee'}`, {
+                            role: activeTab === 'admin' ? t('role.Admin', 'Administrator') : t('role.Sales', 'Employee'),
+                          })}
+                        </span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => handleTabChange('register')}
+                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium inline-flex items-center gap-1"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Don't have an account yet? Register here
+                    </button>
+                  </div>
+                </>
+              )}
             </form>
 
             {/* Quick 1-Click Demo Logins Section */}
-            <div className="mt-7 pt-6 border-t border-slate-200 dark:border-slate-800">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  {t('login.quick_demo_roles', '1-Click Demo Logins')}
-                </span>
-                <span className="text-[11px] text-blue-600 dark:text-blue-400">{t('login.preconfigured', 'Pre-configured')}</span>
-              </div>
+            {activeTab !== 'register' && (
+              <div className="mt-7 pt-6 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    {t('login.quick_demo_roles', '1-Click Demo Logins')}
+                  </span>
+                  <span className="text-[11px] text-blue-600 dark:text-blue-400">{t('login.preconfigured', 'Pre-configured')}</span>
+                </div>
 
               {activeTab === 'admin' ? (
                 <div className="space-y-2">
@@ -452,6 +694,7 @@ export const Login: React.FC = () => {
                 </div>
               )}
             </div>
+            )}
           </div>
         </div>
       </main>

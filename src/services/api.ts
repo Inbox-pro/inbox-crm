@@ -1,12 +1,7 @@
 /**
  * Centralized API Client Layer
  *
- * In this stage, all requests are routed through this simulated service
- * layer with realistic async promise resolution.
- *
- * In production with Express + MongoDB:
- * Replace the mockDb calls with standard `fetch(`${API_BASE_URL}/api/...`)`
- * or axios requests without needing to change any component UI code.
+ * Provides typed responses, base URL configuration, and authenticated header helpers.
  */
 
 export interface ApiResponse<T> {
@@ -21,6 +16,14 @@ export interface ApiResponse<T> {
 }
 
 export const API_BASE_URL = ((import.meta as any).env?.VITE_API_BASE_URL as string) || '/api';
+
+export const getAuthHeaders = (): Record<string, string> => {
+  const token = localStorage.getItem('inbox_crm_auth_token_v2');
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
 
 // Small configurable simulated network latency (50-100ms) for realistic loading state demonstration
 export const simulateNetworkLatency = <T>(result: T, delayMs: number = 60): Promise<T> => {

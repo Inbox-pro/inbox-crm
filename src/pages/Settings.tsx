@@ -15,6 +15,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { settingsService, OrganizationSettings, CustomFieldDefinition, ScoringRule } from '../services/settingsService';
+import { authService } from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -33,8 +34,10 @@ export const Settings: React.FC = () => {
   const [newMember, setNewMember] = useState({
     name: '',
     email: '',
+    password: 'Welcome@2026!',
     role: 'Sales' as any,
   });
+  const [isInviting, setIsInviting] = useState(false);
 
   const { currentOrg, userRole, hasPermission } = useAuth();
   const { showToast } = useToast();
@@ -44,8 +47,23 @@ export const Settings: React.FC = () => {
     const fetchSettings = async () => {
       setLoading(true);
       try {
-        const res = await settingsService.getSettings();
-        setSettings(res.data);
+        const [res, usersRes] = await Promise.all([
+          settingsService.getSettings(),
+          authService.getUsers(),
+        ]);
+        if (res.data) {
+          let loadedUsers = res.data.users;
+          if (usersRes.success && Array.isArray(usersRes.data) && usersRes.data.length > 0) {
+            loadedUsers = usersRes.data.map((u: any) => ({
+              id: u.id,
+              name: u.name,
+              email: u.email,
+              role: u.role,
+              status: (u.status || 'Active') as 'Active' | 'Inactive',
+            }));
+          }
+          setSettings({ ...res.data, users: loadedUsers });
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -68,22 +86,50 @@ export const Settings: React.FC = () => {
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!settings) return;
-    const updatedUsers = [
-      ...settings.users,
-      {
-        id: `usr_${Date.now()}`,
-        name: newMember.name,
-        email: newMember.email,
-        role: newMember.role,
-        status: 'Active' as const,
-      },
-    ];
-    setSettings({ ...settings, users: updatedUsers });
-    await settingsService.updateSettings({ ...settings, users: updatedUsers });
-    showToast(`Invited ${newMember.name} as ${newMember.role}`);
-    setIsAddUserModalOpen(false);
-    setNewMember({ name: '', email: '', role: 'Sales' });
+    if (!newMember.name.trim() || !newMember.email.trim()) {
+      showToast('Please fill out name and email', 'error');
+      return;
+    }
+
+    setIsInviting(true);
+    try {
+      const res = await authService.register(
+        {
+          name: newMember.name.trim(),
+          email: newMember.email.trim(),
+          password: newMember.password || 'Welcome@2026!',
+          role: newMember.role,
+          department: 'Sales',
+        },
+        { autoLogin: false }
+      );
+
+      if (res.success && res.data) {
+        showToast(`Invited ${newMember.name} and saved to MongoDB Atlas!`, 'success');
+        if (settings) {
+          const updatedUsers = [
+            ...settings.users,
+            {
+              id: res.data.id,
+              name: res.data.name,
+              email: res.data.email,
+              role: res.data.role,
+              status: 'Active' as const,
+            },
+          ];
+          setSettings({ ...settings, users: updatedUsers });
+          await settingsService.updateSettings({ ...settings, users: updatedUsers });
+        }
+        setIsAddUserModalOpen(false);
+        setNewMember({ name: '', email: '', password: 'Welcome@2026!', role: 'Sales' });
+      } else {
+        showToast(res.message || 'Failed to register member.', 'error');
+      }
+    } catch (err: any) {
+      showToast(err.message || 'Error communicating with database.', 'error');
+    } finally {
+      setIsInviting(false);
+    }
   };
 
   const handleResetData = () => {
@@ -459,6 +505,18 @@ export const Settings: React.FC = () => {
               onChange={e => setNewMember({ ...newMember, email: e.target.value })}
               className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white"
             />
+          </div>
+          <div>
+            <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Initial Password *</label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Welcome@2026!"
+              value={newMember.password}
+              onChange={e => setNewMember({ ...newMember, password: e.target.value })}
+              className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white font-mono"
+            />
+            <p className="text-[10px] text-slate-400 mt-1">Must have ≥8 characters, uppercase, lowercase, number, and special character.</p>
           </div>
           <div>
             <label className="block font-medium text-slate-700 dark:text-slate-300 mb-1">Access Role</label>
